@@ -1,0 +1,485 @@
+<html><head><base href="https://boardgamemeetuporganizer.com/">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#667eea">
+<title>¡Apúntate a Partidas de Juegos de Mesa!</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192x192.png">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 800 800"><defs><pattern id="dicePattern" patternUnits="userSpaceOnUse" width="100" height="100"><circle cx="50" cy="50" r="20" fill="%23ffffff22"/><circle cx="50" cy="50" r="5" fill="%23ffffff44"/></pattern></defs><rect width="100%" height="100%" fill="%23667eea"/><rect width="100%" height="100%" fill="url(%23dicePattern)"/></svg>') no-repeat center center fixed;
+        background-size: cover;
+    }
+
+    .container {
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+        padding: 20px;
+        width: 90%;
+        max-width: 1000px;
+    }
+
+    @media (min-width: 768px) {
+    }
+
+    h1 {
+        color: #4a4a4a;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2.2em;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        margin-top: 40px; /* Added margin */
+    }
+
+    #attendanceStats {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 40px;
+        background-color: #f0f0f0;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    #attendanceStats h2 {
+        color: #4a4a4a;
+        margin-top: 0;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    #toggleStats {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        z-index: 1000;
+    }
+
+    .days {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 40px;
+        flex-wrap: wrap;
+    }
+
+    .day {
+        flex: 1;
+        min-width: 250px;
+        margin: 10px;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .day:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .friday {
+        background-color: #FFD700;
+    }
+
+    .saturday {
+        background-color: #98FB98;
+    }
+
+    .sunday {
+        background-color: #87CEFA;
+    }
+
+    .day h2 {
+        margin-top: 0;
+        color: #333;
+        text-align: center;
+        font-size: 1.8em;
+        margin-bottom: 5px;
+    }
+
+    .day p {
+        text-align: center;
+        color: #444;
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+
+    .day input[type="text"], .day input[type="date"], .day select {
+        background-color: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .day button {
+        background-color: #4a4a4a;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: bold;
+    }
+
+    .day button:hover {
+        background-color: #333;
+        transform: scale(1.05);
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    li {
+        background-color: #ffffff;
+        margin-bottom: 10px;
+        padding: 15px;
+        border-radius: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    button {
+        background-color: #6c5ce7;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: bold;
+    }
+
+    button:hover {
+        background-color: #5541d7;
+        transform: scale(1.05);
+    }
+
+    input[type="text"], input[type="date"], select {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 1em;
+    }
+
+    .munchis {
+        display: flex;
+        flex-direction: column;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .munchis label {
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    .munchis input[type="radio"] {
+        margin-right: 10px;
+    }
+
+    #gameProposal, #proposedGames, #upcomingActivities {
+        margin-top: 40px;
+        background-color: #f0f0f0;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    #gameProposal h2, #proposedGames h2, #upcomingActivities h2 {
+        color: #4a4a4a;
+        margin-top: 0;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    #gamesList li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .emoji {
+        font-size: 1.5em;
+        margin-left: 10px;
+    }
+
+    .dice-icon {
+        font-size: 1.5em;
+        margin-right: 10px;
+    }
+
+    #statsContent {
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    @keyframes fadeInOut {
+        0% { opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { opacity: 0; }
+    }
+
+    @keyframes moveRight {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100vw); }
+    }
+
+    @keyframes moveLeft {
+        0% { transform: translateX(100vw); }
+        100% { transform: translateX(-100%); }
+    }
+
+    @keyframes rotateDice {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .dice-animation {
+        position: fixed;
+        width: 50px;
+        height: 50px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        z-index: -1;
+        animation: moveRight 20s linear infinite, rotateDice 4s linear infinite;
+    }
+
+    .dice-1 {
+        top: 20%;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffffff' d='M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2m7 7a2 2 0 0 0-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2a2 2 0 0 0-2-2Z'/%3E%3C/svg%3E");
+    }
+
+    .dice-2 {
+        top: 40%;
+        animation-delay: -5s;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffffff' d='M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2m2 14h2a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1m10-10h-2a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1Z'/%3E%3C/svg%3E");
+    }
+
+    .dice-3 {
+        top: 60%;
+        animation-delay: -10s;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffffff' d='M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2m7 7a2 2 0 0 0-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2a2 2 0 0 0-2-2M7 5a2 2 0 0 0-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2a2 2 0 0 0-2-2m10 10a2 2 0 0 0-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2a2 2 0 0 0-2-2Z'/%3E%3C/svg%3E");
+    }
+
+    #adminPanel {
+        display: none;
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    #adminPanel input[type="password"], #aiTrainingInput {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+    }
+
+    #upcomingActivities {
+        margin-top: 40px;
+        background-color: #f0f0f0;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    #upcomingActivities h2 {
+        color: #4a4a4a;
+        margin-top: 0;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    #activitiesList li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    #activitiesList li button {
+        background-color: #ff4d4d;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    #adminActivities input[type="text"] {
+        width: calc(100% - 110px);
+        padding: 10px;
+        margin-right: 10px;
+    }
+
+    #adminActivities button {
+        padding: 10px;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 20px;
+        }
+
+        .day {
+            min-width: 100%;
+        }
+
+        h1 {
+            font-size: 1.8em;
+        }
+
+        .day h2 {
+            font-size: 1.5em;
+        }
+
+        button {
+            padding: 10px 15px;
+        }
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎲 ¡Apúntate a Partidas de Juegos de Mesa! 🎲</h1>
+        <button id="toggleStats" onclick="toggleStatsDisplay()">Info</button>
+
+        <div class="days">
+            <div class="day friday">
+                <h2>Viernes</h2>
+                <input type="date" id="fridayDateInput" onchange="updateDates()">
+                <p id="fridayDate"></p>
+                <ul id="fridayList"></ul>
+                <input type="text" id="fridayName" placeholder="Tu nombre">
+                <select id="fridayTime">
+                    <option value="">Selecciona hora</option>
+                    <option value="17:00">17:00</option>
+                    <option value="18:00">18:00</option>
+                    <option value="19:00">19:00</option>
+                    <option value="20:00">20:00</option>
+                </select>
+                <div class="munchis">
+                    <label>
+                        <input type="radio" name="fridayMunchis" value="want"> Quiero munchis
+                    </label>
+                    <label>
+                        <input type="radio" name="fridayMunchis" value="bring"> Compro yo las munchis
+                    </label>
+                    <label>
+                        <input type="radio" name="fridayMunchis" value="none" checked> No quiero munchis
+                    </label>
+                </div>
+                <button onclick="addPlayer('friday')">Apuntarme</button>
+            </div>
+            
+            <div class="day saturday">
+                <h2>Sábado</h2>
+                <input type="date" id="saturdayDateInput" onchange="updateDates()">
+                <p id="saturdayDate"></p>
+                <ul id="saturdayList"></ul>
+                <input type="text" id="saturdayName" placeholder="Tu nombre">
+                <select id="saturdayTime">
+                    <option value="">Selecciona hora</option>
+                    <option value="17:00">17:00</option>
+                    <option value="18:00">18:00</option>
+                    <option value="19:00">19:00</option>
+                    <option value="20:00">20:00</option>
+                </select>
+                <div class="munchis">
+                    <label>
+                        <input type="radio" name="saturdayMunchis" value="want"> Quiero munchis
+                    </label>
+                    <label>
+                        <input type="radio" name="saturdayMunchis" value="bring"> Compro yo las munchis
+                    </label>
+                    <label>
+                        <input type="radio" name="saturdayMunchis" value="none" checked> No quiero munchis
+                    </label>
+                </div>
+                <button onclick="addPlayer('saturday')">Apuntarme</button>
+            </div>
+            
+            <div class="day sunday">
+                <h2>Domingo</h2>
+                <input type="date" id="sundayDateInput" onchange="updateDates()">
+                <p id="sundayDate"></p>
+                <ul id="sundayList"></ul>
+                <input type="text" id="sundayName" placeholder="Tu nombre">
+                <select id="sundayTime">
+                    <option value="">Selecciona hora</option>
+                    <option value="17:00">17:00</option>
+                    <option value="18:00">18:00</option>
+                    <option value="19:00">19:00</option>
+                    <option value="20:00">20:00</option>
+                </select>
+                <div class="munchis">
+                    <label>
+                        <input type="radio" name="sundayMunchis" value="want"> Quiero munchis
+                    </label>
+                    <label>
+                        <input type="radio" name="sundayMunchis" value="bring"> Compro yo las munchis
+                    </label>
+                    <label>
+                        <input type="radio" name="sundayMunchis" value="none" checked> No quiero munchis
+                    </label>
+                </div>
+                <button onclick="addPlayer('sunday')">Apuntarme</button>
+            </div>
+        </div>
+        
+        <div id="gameProposal">
+            <h2><span class="dice-icon">🎲</span> Propón un Juego <span class="dice-icon">🎲</span></h2>
+            <input type="text" id="gameProposalInput" placeholder="Nombre del juego">
+            <button onclick="proposeGame()">Proponer Juego</button>
+        </div>
+        
+        <div id="proposedGames">
+            <h2><span class="dice-icon">🎲</span> Juegos Propuestos <span class="dice-icon">🎲</span></h2>
+            <ul id="gamesList"></ul>
+        </div>
+
+        <div id="attendanceStats" style="display: none;">
+            <h2><span class="dice-icon">📊</span> Estadísticas de Asistencia <span class="dice-icon">📊</span></h2>
+            <div id="statsContent"></div>
+            <div>
+                <button onclick="adjustAttendance('friday', 1)">Viernes +</button>
+                <button onclick="adjustAttendance('friday', -1)">Viernes -</button>
+                <button onclick="adjustAttendance('saturday', 1)">Sábado +</button>
+                <button onclick="adjustAttendance('saturday', -1)">Sábado -</button>
+                <button onclick="adjustAttendance('sunday', 1)">Domingo +</button>
+                <button onclick="adjustAttendance('sunday', -1)">Domingo -</button>
+            </div>
+        </div>
+
+        <div id="upcomingActivities">
+            <h2><span class="dice-icon">📅</span> Próximas Actividades <span class="dice-icon">📅</span></h2>
+            <ul id="activitiesList"></ul>
+            <div id="adminActivities" style="display: none;">
+                <input type="text" id="adminActivitiesInput" placeholder="Actividad">
+                <button onclick="addActivity()">Añadir Actividad</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
