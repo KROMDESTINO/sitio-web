@@ -371,6 +371,30 @@
     }
 </style>
 </head>
+   <!-- Agregar los scripts de Firebase -->
+<script type="module">
+  // Importar las funciones necesarias del SDK de Firebase
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+  // TODO: Añadir SDKs de los productos de Firebase que quieres utilizar
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Configuración de Firebase para tu aplicación web
+  const firebaseConfig = {
+    apiKey: "AIzaSyDxqAMsDpuzsGNcZzK1d74ucvIV4bfAOE",
+    authDomain: "juegos-de-mesa-9d7ef.firebaseapp.com",
+    databaseURL: "https://juegos-de-mesa-9d7ef-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "juegos-de-mesa-9d7ef",
+    storageBucket: "juegos-de-mesa-9d7ef.appspot.com",
+    messagingSenderId: "289986562577",
+    appId: "1:289986562577:web:02878f48c9154cebf8b0"
+  };
+  // Inicializar Firebase
+  const app = initializeApp(firebaseConfig);
+  // Aquí agregarías otras importaciones necesarias, como Firestore
+  import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+  const db = getFirestore(app); // Inicializa Firestore
+</script>
+
 <body>
     <div class="container">
         <img src="/a/cdaf20ad-c9d1-42cb-a2d5-3740947188b1" alt="Logo del club de juegos de mesa" id="clubLogo">
