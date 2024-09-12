@@ -1,206 +1,137 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <base href="https://boardgamemeetuporganizer.com/">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#667eea">
-  <title>¡Apúntate a Partidas de Juegos de Mesa!</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icon-192x192.png">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-
-    /* Estilos del sitio web */
-    body {
-        font-family: 'Poppins', sans-serif;
-        margin: 0;
-        padding: 0;
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 800 800"><defs><pattern id="dicePattern" patternUnits="userSpaceOnUse" width="100" height="100"><circle cx="50" cy="50" r="20" fill="%23ffffff22"/><circle cx="50" cy="50" r="5" fill="%23ffffff44"/></pattern></defs><rect width="100%" height="100%" fill="%23667eea"/><rect width="100%" height="100%" fill="url(%23dicePattern)"/></svg>') no-repeat center center fixed;
-        background-size: cover;
-    }
-    .container {
-        background-color: rgba(255, 255, 255, 0.9);
-        border-radius: 20px;
-        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
-        padding: 20px;
-        width: 90%;
-        max-width: 1000px;
-    }
-    /* Resto del CSS omitido por brevedad */
-  </style>
+  <title>Juegos de Mesa</title>
 </head>
 <body>
-    <div class="container">
-        <h1>🎲 ¡Apúntate a Partidas de Juegos de Mesa! 🎲</h1>
-        <button id="toggleStats" onclick="toggleStatsDisplay()">Info</button>
+  <h1>Registro de Jugadores</h1>
+  
+  <!-- Formulario para agregar jugadores -->
+  <div>
+    <label for="nombre">Nombre del Jugador:</label>
+    <input type="text" id="nombre" placeholder="Escribe el nombre">
+    <br>
+    <label for="dia">Día:</label>
+    <input type="date" id="dia" onchange="updateDates()">
+    <br>
+    <label for="hora">Hora:</label>
+    <input type="time" id="hora">
+    <br>
+    <button onclick="addPlayer()">Agregar Jugador</button>
+  </div>
 
-        <div class="days">
-            <!-- Contenido del formulario para días de la semana -->
-            <!-- Viernes -->
-            <div class="day friday">
-                <h2>Viernes</h2>
-                <input type="date" id="fridayDateInput" onchange="updateDates()">
-                <p id="fridayDate"></p>
-                <ul id="fridayList"></ul>
-                <input type="text" id="fridayName" placeholder="Tu nombre">
-                <select id="fridayTime">
-                    <option value="">Selecciona hora</option>
-                    <option value="17:00">17:00</option>
-                    <option value="18:00">18:00</option>
-                    <option value="19:00">19:00</option>
-                    <option value="20:00">20:00</option>
-                </select>
-                <div class="munchis">
-                    <label>
-                        <input type="radio" name="fridayMunchis" value="want"> Quiero munchis
-                    </label>
-                    <label>
-                        <input type="radio" name="fridayMunchis" value="bring"> Compro yo las munchis
-                    </label>
-                    <label>
-                        <input type="radio" name="fridayMunchis" value="none" checked> No quiero munchis
-                    </label>
-                </div>
-                <button onclick="addPlayer('friday')">Apuntarme</button>
-            </div>
-            
-            <!-- Repetir para Sábado y Domingo -->
-        </div>
+  <!-- Mostrar lista de jugadores -->
+  <div>
+    <h2>Lista de Jugadores</h2>
+    <ul id="lista-jugadores"></ul>
+  </div>
+  
+  <!-- Agregar los scripts de Firebase -->
+  <script type="module">
+    // Importar las funciones necesarias del SDK de Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
-        <!-- Sección para proponer juegos -->
-        <div id="gameProposal">
-            <h2><span class="dice-icon">🎲</span> Propón un Juego <span class="dice-icon">🎲</span></h2>
-            <input type="text" id="gameProposalInput" placeholder="Nombre del juego">
-            <button onclick="proposeGame()">Proponer Juego</button>
-        </div>
+    // Configuración de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDxqAMsDpuzsGNcZzK1d74ucvIV4bfAOE",
+      authDomain: "juegos-de-mesa-9d7ef.firebaseapp.com",
+      databaseURL: "https://juegos-de-mesa-9d7ef-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "juegos-de-mesa-9d7ef",
+      storageBucket: "juegos-de-mesa-9d7ef.appspot.com",
+      messagingSenderId: "289986562577",
+      appId: "1:289986562577:web:02878f48c9154cebf8b0"
+    };
 
-        <!-- Sección de juegos propuestos -->
-        <div id="proposedGames">
-            <h2><span class="dice-icon">🎲</span> Juegos Propuestos <span class="dice-icon">🎲</span></h2>
-            <ul id="gamesList"></ul>
-        </div>
+    // Inicializar Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app); // Inicializa Firestore
 
-        <!-- Más secciones omitidas por brevedad -->
+    // Función para agregar un jugador a Firestore
+    async function addPlayer() {
+      const nombre = document.getElementById('nombre').value;
+      const dia = document.getElementById('dia').value;
+      const hora = document.getElementById('hora').value;
+      
+      if (nombre === '' || dia === '' || hora === '') {
+        alert('Por favor, completa todos los campos.');
+        return;
+      }
+      
+      try {
+        await addDoc(collection(db, "players"), { nombre, dia, hora });
+        alert('Jugador registrado exitosamente!');
+        getPlayers(); // Actualizar la lista de jugadores después de agregar
+      } catch (error) {
+        console.error('Error al registrar jugador:', error);
+      }
+    }
 
-    </div>
+    // Función para obtener todos los jugadores de Firestore
+    async function getPlayers() {
+      const listaJugadores = document.getElementById('lista-jugadores');
+      listaJugadores.innerHTML = ''; // Limpiar la lista antes de agregar los jugadores
+      
+      try {
+        const querySnapshot = await getDocs(collection(db, "players"));
+        querySnapshot.forEach((doc) => {
+          const jugador = doc.data();
+          const li = document.createElement('li');
+          li.textContent = `${jugador.nombre} - ${jugador.dia} - ${jugador.hora}`;
+          li.setAttribute('data-id', doc.id);
+          li.innerHTML += ` <button onclick="deletePlayer('${doc.id}')">Eliminar</button> 
+                            <button onclick="editPlayer('${doc.id}')">Editar</button>`;
+          listaJugadores.appendChild(li);
+        });
+      } catch (error) {
+        console.error('Error al obtener jugadores:', error);
+      }
+    }
 
-    <!-- Scripts de Firebase y funciones -->
-    <script type="module">
-        // Importar funciones necesarias del SDK de Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+    // Función para eliminar un jugador
+    async function deletePlayer(id) {
+      try {
+        await deleteDoc(doc(db, "players", id));
+        alert('Jugador eliminado correctamente!');
+        getPlayers(); // Actualizar la lista de jugadores después de eliminar
+      } catch (error) {
+        console.error('Error al eliminar jugador:', error);
+      }
+    }
 
-        // Configuración de Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyDxqAMsDpuzsGNcZzK1d74ucvIV4bfAOE",
-            authDomain: "juegos-de-mesa-9d7ef.firebaseapp.com",
-            databaseURL: "https://juegos-de-mesa-9d7ef-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "juegos-de-mesa-9d7ef",
-            storageBucket: "juegos-de-mesa-9d7ef.appspot.com",
-            messagingSenderId: "289986562577",
-            appId: "1:289986562577:web:02878f48c9154cebf8b0"
-        };
+    // Función para editar un jugador
+    function editPlayer(id) {
+      const nombre = prompt('Nuevo nombre:');
+      const dia = prompt('Nuevo día (YYYY-MM-DD):');
+      const hora = prompt('Nueva hora (HH:MM):');
+      
+      if (nombre && dia && hora) {
+        updatePlayer(id, { nombre, dia, hora });
+      }
+    }
 
-        // Inicializar Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app); // Inicializa Firestore
+    // Función para actualizar un jugador en Firestore
+    async function updatePlayer(id, newData) {
+      try {
+        const playerRef = doc(db, "players", id);
+        await updateDoc(playerRef, newData);
+        alert('Jugador actualizado correctamente!');
+        getPlayers(); // Actualizar la lista de jugadores después de actualizar
+      } catch (error) {
+        console.error('Error al actualizar jugador:', error);
+      }
+    }
 
-        // Funciones de Firebase
-        async function addPlayer(day) {
-            const nameInput = document.getElementById(day + 'Name').value;
-            const dateInput = document.getElementById(day + 'DateInput').value;
-            const timeInput = document.getElementById(day + 'Time').value;
-            const munchisInput = document.querySelector(`input[name="${day}Munchis"]:checked`).value;
-          
-            try {
-                const docRef = await addDoc(collection(db, "players"), {
-                    nombre: nameInput,
-                    dia: dateInput,
-                    hora: timeInput,
-                    munchis: munchisInput,
-                    diaSemana: day
-                });
-                alert('Jugador registrado exitosamente!');
-                getPlayers(day); // Actualizar la lista de jugadores después de agregar
-            } catch (error) {
-                console.error('Error al registrar jugador:', error);
-            }
-        }
+    // Función para manejar cambios en las fechas
+    function updateDates() {
+      console.log('Función updateDates llamada');
+      // Aquí puedes añadir lógica para manejar cambios en las fechas
+    }
 
-        async function getPlayers(day) {
-            const listElement = document.getElementById(day + 'List');
-            listElement.innerHTML = ''; // Limpiar la lista antes de agregar nuevos jugadores
-
-            try {
-                const querySnapshot = await getDocs(collection(db, "players"));
-                querySnapshot.forEach((doc) => {
-                    const player = doc.data();
-                    if (player.diaSemana === day) {
-                        const li = document.createElement('li');
-                        li.textContent = `${player.nombre} - ${player.dia} - ${player.hora} - Munchis: ${player.munchis}`;
-                        li.innerHTML += ` <button onclick="deletePlayer('${doc.id}')">Eliminar</button> 
-                                          <button onclick="editPlayer('${doc.id}')">Editar</button>`;
-                        listElement.appendChild(li);
-                    }
-                });
-            } catch (error) {
-                console.error('Error al obtener jugadores:', error);
-            }
-        }
-
-        async function deletePlayer(id) {
-            try {
-                await deleteDoc(doc(db, "players", id));
-                alert('Jugador eliminado correctamente!');
-                // Re-cargar los jugadores después de la eliminación
-            } catch (error) {
-                console.error('Error al eliminar jugador:', error);
-            }
-        }
-
-        function editPlayer(id) {
-            const nombre = prompt('Nuevo nombre:');
-            const dia = prompt('Nuevo día (YYYY-MM-DD):');
-            const hora = prompt('Nueva hora (HH:MM):');
-            
-            if (nombre && dia && hora) {
-                updatePlayer(id, { nombre, dia, hora });
-            }
-        }
-
-        async function updatePlayer(id, newData) {
-            try {
-                const playerRef = doc(db, "players", id);
-                await updateDoc(playerRef, newData);
-                alert('Jugador actualizado correctamente!');
-                // Re-cargar los jugadores después de la actualización
-            } catch (error) {
-                console.error('Error al actualizar jugador:', error);
-            }
-        }
-
-        function updateDates() {
-            console.log('Función updateDates llamada');
-            // Lógica adicional para manejar cambios en las fechas
-        }
-
-        function proposeGame() {
-            const gameName = document.getElementById('gameProposalInput').value;
-            // Lógica para proponer un juego
-            alert('Juego propuesto: ' + gameName);
-        }
-
-        // Llamar a getPlayers al cargar la página para mostrar los jugadores existentes
-        getPlayers('friday');
-        getPlayers('saturday');
-        getPlayers('sunday');
-    </script>
+    // Llamar a getPlayers al cargar la página para mostrar los jugadores existentes
+    getPlayers();
+  </script>
 </body>
 </html>
